@@ -2,6 +2,8 @@
 
 import 'dart:async';
 
+import 'package:flutter_svg/svg.dart';
+
 import '/exports/exports.dart';
 
 class Onboarding extends StatefulWidget {
@@ -21,11 +23,9 @@ class _OnboardingState extends State<Onboarding>
     _controller = AnimationController(
         vsync: this, value: 0, duration: const Duration(milliseconds: 800));
     _controller?.forward();
-    _controller?.addListener(() {
-      Timer.periodic(const Duration(seconds: 3), (timer) {
-          Routes.routeUntil(context, Routes.signUp);
-      });
-    });
+     Future.delayed(const Duration(seconds: 3),(){
+      Routes.routeUntil(context, Routes.home);
+     });
   }
 
   @override
@@ -42,7 +42,13 @@ class _OnboardingState extends State<Onboarding>
         child:  SafeArea(
           child: Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                AspectRatio(
+                aspectRatio: 1.0,
+                child: SvgPicture.asset("assets/caretaker.svg"),
+              ),
                 const CircularProgressIndicator.adaptive(),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03,),
                 const Text(

@@ -19,5 +19,6 @@ static void named(BuildContext context, String route){
       Routes.onBoarding: (context) => const Onboarding(),
       Routes.login: (context) => const Login(),
       Routes.signUp: (context) => const SignUp(),
+      Routes.home: (context) => const HomePageView(),
    };
 }

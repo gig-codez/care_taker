@@ -58,10 +58,10 @@ flutter:
 # flutter_native_splash-development.yaml
 flutter_native_splash:
   color: "#115B73"
-  image: assets/
+  # image: assets/
 
   android_12:
-    image: assets/
+    # image: assets/
     icon_background_color: "#115B73"
 
   web: false
