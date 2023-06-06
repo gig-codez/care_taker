@@ -4,14 +4,15 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    
 
     <application
         android:label="CareTaker"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <!-- google maps -->
-    <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyCoRlGI0kAyPZiv6CLOja55iv_FkoAT7MM"/>
+    <!-- <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyCoRlGI0kAyPZiv6CLOja55iv_FkoAT7MM"/> -->
                <!-- end of google maps -->
         <activity
             android:name=".MainActivity"
