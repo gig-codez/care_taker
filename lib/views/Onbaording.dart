@@ -23,7 +23,7 @@ class _OnboardingState extends State<Onboarding>
     _controller = AnimationController(
         vsync: this, value: 0, duration: const Duration(milliseconds: 800));
     _controller?.forward();
-     Future.delayed(const Duration(seconds: 3),(){
+     Future.delayed(const Duration(seconds: 5),(){
       Routes.routeUntil(context, Routes.home);
      });
   }

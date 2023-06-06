@@ -1,4 +1,7 @@
-import 'package:flutter/material.dart';
+import '/exports/exports.dart';
+
+import 'pages/map.dart';
+import 'pages/patientDetials.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -23,10 +26,48 @@ class _HomePageViewState extends State<HomePageView>
     super.dispose();
   }
 
+// pages
+  List<Widget> pages = [
+     const MapView(),
+    const PatientDetails(),
+  ];
+  // controller
+  final PageController _pageController = PageController();
+  // page index
+  int _currentPage = 0;
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Placeholder(),
+    return Scaffold(
+      body: PageView.builder(
+        itemBuilder: (context, index) {
+          return pages[index];
+        },
+        itemCount: pages.length,
+        controller: _pageController,
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentPage,
+        onTap: (index) {
+          setState(() {
+            _currentPage = index;
+          });
+          // 
+          _pageController.jumpToPage(index);
+          _pageController.animateToPage(index,
+              duration: const Duration(milliseconds: 500), curve: Curves.ease);
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          )
+        ],
+      ),
     );
   }
 }

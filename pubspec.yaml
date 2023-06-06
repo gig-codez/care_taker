@@ -27,6 +27,7 @@ dependencies:
   flutter_bloc: ^8.1.3
   provider: ^6.0.5
   firebase_ui_auth: ^1.4.1
+  google_maps_flutter: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -38,7 +39,14 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: "^0.13.1"
 
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/appstore.png"
+  min_sdk_android: 21
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -58,13 +66,19 @@ flutter:
 # flutter_native_splash-development.yaml
 flutter_native_splash:
   color: "#115B73"
-  # image: assets/
+  image: assets/appstore.png
 
   android_12:
-    # image: assets/
+    image: assets/appstore.png
     icon_background_color: "#115B73"
+  android_gravity: center
+  #
+  # ios_content_mode can be one of the following iOS UIView.ContentMode (see
+  # https://developer.apple.com/documentation/uikit/uiview/contentmode): scaleToFill,
+  # scaleAspectFit, scaleAspectFill, center, top, bottom, left, right, topLeft, topRight,
+  # bottomLeft, or bottomRight.
+  ios_content_mode: center
 
-  web: false
   fullscreen: true
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
