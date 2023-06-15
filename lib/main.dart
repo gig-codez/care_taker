@@ -2,12 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'exports/exports.dart';
 import 'firebase_options.dart';
 void main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+ WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
    options: DefaultFirebaseOptions.currentPlatform,
  );
-//  initializing firebase options
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+// //  initializing firebase options
+//   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   runApp(
     MaterialApp(

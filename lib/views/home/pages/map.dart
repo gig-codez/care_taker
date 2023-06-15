@@ -1,10 +1,12 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'dart:math';
+import 'package:care_taker/views/home/pages/patientDetials.dart';
+import 'package:care_taker/widgets/space.dart';
 
-import 'package:flutter/foundation.dart';
+import '/views/home/pages/widgets/mapWidget.dart';
 
 import '/exports/exports.dart';
+
 class MapView extends StatefulWidget {
   const MapView({super.key});
 
@@ -21,8 +23,6 @@ class _MapViewState extends State<MapView> {
 
 // Copyright 2018 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
-
-
 
 final LatLngBounds sydneyBounds = LatLngBounds(
   southwest: const LatLng(-34.022631, 150.620685),
@@ -331,10 +331,49 @@ class MapUiBodyState extends State<MapUiBody> {
     }
   }
 
+//  top widget
+  Widget topWidget() {
+    return Container(
+      height: MediaQuery.of(context).size.width / 9,
+      width: MediaQuery.of(context).size.width,
+      margin: EdgeInsets.only(
+          top: MediaQuery.of(context).size.width / 9, left: 20, right: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(100),
+        color: Colors.white.withOpacity(0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 2,
+            blurRadius: 2,
+            offset: const Offset(0, 3), // changes position of shadow
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          IconButton(onPressed: () {}, icon: const Icon(Icons.menu)),
+          IconButton(
+            onPressed: () => Routes.push(
+              context,
+              const PatientDetails(),
+            ),
+            icon: const CircleAvatar(
+              child: Icon(Icons.person_3_rounded),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final MapboxMap mapboxMap = MapboxMap(
-      accessToken: "pk.eyJ1IjoibXVnYW1iYTI1NiIsImEiOiJjbGlqcjN3aTYwNHY5M3ZxbGxwcHE1bXZ3In0.0PPO-zzV4DrjToXPlUMVmA",
+      accessToken:
+          "sk.eyJ1IjoibXVnYW1iYTI1NiIsImEiOiJjbGlrOWFjdGIwMHh0M3FxbTF2bDJ2cXR6In0.JOUkusZ5PXHS7imtXwYAXA",
       onMapCreated: onMapCreated,
       initialCameraPosition: _kInitialPosition,
       trackCameraPosition: true,
@@ -356,9 +395,7 @@ class MapUiBodyState extends State<MapUiBody> {
         print("Filter $_featureQueryFilter");
         List features = await mapController!
             .queryRenderedFeatures(point, [], _featureQueryFilter);
-        if (kDebugMode) {
-          print('# features: ${features.length}');
-        }
+        print('# features: ${features.length}');
         _clearFill();
         if (features.isEmpty && _featureQueryFilter != null) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -368,40 +405,32 @@ class MapUiBodyState extends State<MapUiBody> {
         }
       },
       onMapLongClick: (point, latLng) async {
-        if (kDebugMode) {
-          print(
+        print(
             "Map long press: ${point.x},${point.y}   ${latLng.latitude}/${latLng.longitude}");
-        }
         Point convertedPoint = await mapController!.toScreenLocation(latLng);
         LatLng convertedLatLng = await mapController!.toLatLng(point);
-        if (kDebugMode) {
-          print(
+        print(
             "Map long press converted: ${convertedPoint.x},${convertedPoint.y}   ${convertedLatLng.latitude}/${convertedLatLng.longitude}");
-        }
         double metersPerPixel =
             await mapController!.getMetersPerPixelAtLatitude(latLng.latitude);
 
-        if (kDebugMode) {
-          print(
+        print(
             "Map long press The distance measured in meters at latitude ${latLng.latitude} is $metersPerPixel m");
-        }
 
         List features =
             await mapController!.queryRenderedFeatures(point, [], null);
-        if (features.isNotEmpty) {
+        if (features.length > 0) {
           print(features[0]);
         }
       },
       onCameraTrackingDismissed: () {
-        setState(() {
+        this.setState(() {
           _myLocationTrackingMode = MyLocationTrackingMode.None;
         });
       },
       onUserLocationUpdated: (location) {
-        if (kDebugMode) {
-          print(
+        print(
             "new location: ${location.position}, alt.: ${location.altitude}, bearing: ${location.bearing}, speed: ${location.speed}, horiz. accuracy: ${location.horizontalAccuracy}, vert. accuracy: ${location.verticalAccuracy}");
-        }
       },
     );
 
@@ -434,21 +463,41 @@ class MapUiBodyState extends State<MapUiBody> {
         ],
       );
     }
-    return Column(
-      mainAxisSize: MainAxisSize.min,
+    return Stack(
       children: [
-        Center(
-          child: SizedBox(
-            width: _mapExpanded ? null : 300.0,
-            height: 200.0,
-            child: mapboxMap,
+        mapboxMap,
+        Positioned(
+          bottom: 5,
+          right: 10,
+          child: Column(
+            children: [
+              FloatingActionButton(
+                heroTag: null,
+                onPressed: _clearFill,
+                child: const Icon(Icons.my_location_rounded),
+              ),
+              const Space(space: 0.05),
+              FloatingActionButton(
+                heroTag: null,
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return BottomSheet(
+                            onClosing: () {},
+                            builder: (context) {
+                              return ListView(
+                                children: [...listViewChildren],
+                              );
+                            });
+                      });
+                },
+                child: const Icon(Icons.directions),
+              ),
+            ],
           ),
         ),
-        Expanded(
-          child: ListView(
-            children: listViewChildren,
-          ),
-        )
+        topWidget(),
       ],
     );
   }

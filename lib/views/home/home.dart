@@ -1,5 +1,6 @@
 import '/exports/exports.dart';
 
+import 'pages/History.dart';
 import 'pages/map.dart';
 import 'pages/patientDetials.dart';
 
@@ -29,6 +30,7 @@ class _HomePageViewState extends State<HomePageView>
 // pages
   List<Widget> pages = [
      const MapView(),
+      Notifications(),
     const PatientDetails(),
   ];
   // controller
@@ -40,6 +42,7 @@ class _HomePageViewState extends State<HomePageView>
   Widget build(BuildContext context) {
     return Scaffold(
       body: PageView.builder(
+        physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           return pages[index];
         },
@@ -47,6 +50,7 @@ class _HomePageViewState extends State<HomePageView>
         controller: _pageController,
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         currentIndex: _currentPage,
         onTap: (index) {
           setState(() {
@@ -63,8 +67,12 @@ class _HomePageViewState extends State<HomePageView>
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
+            icon: Icon(Icons.notifications),
+            label: 'Notifications',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.message),
+            label: 'Messages',
           )
         ],
       ),

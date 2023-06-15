@@ -15,6 +15,9 @@ static void pop(BuildContext context){
 static void named(BuildContext context, String route){
   Navigator.of(context).pushNamed(route);
 }
+static void push(BuildContext context, Widget widget){
+  Navigator.of(context).push(MaterialPageRoute(builder: (context) => widget));
+}
   static Map<String, Widget Function(BuildContext)> routes = {
       Routes.onBoarding: (context) => const Onboarding(),
       Routes.login: (context) => const Login(),
