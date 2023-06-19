@@ -4,6 +4,7 @@
         "cupertino",
         "fullscreen",
         "Geofence",
+        "Geolocator",
         "Mapbox",
         "Onbaording",
         "signup",

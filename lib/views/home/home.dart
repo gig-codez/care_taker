@@ -2,6 +2,7 @@ import '/exports/exports.dart';
 
 import 'pages/History.dart';
 import 'pages/map.dart';
+import 'pages/notifications.dart';
 import 'pages/patientDetials.dart';
 
 class HomePageView extends StatefulWidget {
@@ -31,7 +32,7 @@ class _HomePageViewState extends State<HomePageView>
   List<Widget> pages = [
      const MapView(),
       Notifications(),
-    const PatientDetails(),
+    const NotificationsView(),
   ];
   // controller
   final PageController _pageController = PageController();

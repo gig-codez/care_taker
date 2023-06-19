@@ -2,8 +2,9 @@
 import 'dart:math';
 import 'package:care_taker/views/home/pages/patientDetials.dart';
 import 'package:care_taker/widgets/space.dart';
+import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 
-import '/views/home/pages/widgets/mapWidget.dart';
 
 import '/exports/exports.dart';
 
@@ -30,7 +31,7 @@ final LatLngBounds sydneyBounds = LatLngBounds(
 );
 
 class MapUiBody extends StatefulWidget {
-  const MapUiBody();
+  const MapUiBody({super.key});
 
   @override
   State<StatefulWidget> createState() => MapUiBodyState();
@@ -39,7 +40,7 @@ class MapUiBody extends StatefulWidget {
 class MapUiBodyState extends State<MapUiBody> {
   MapUiBodyState();
 
-  static final CameraPosition _kInitialPosition = const CameraPosition(
+  static const CameraPosition _kInitialPosition = CameraPosition(
     target: LatLng(-33.852, 151.211),
     zoom: 11.0,
   );
@@ -54,12 +55,12 @@ class MapUiBodyState extends State<MapUiBody> {
   int _styleStringIndex = 0;
   // Style string can a reference to a local or remote resources.
   // On Android the raw JSON can also be passed via a styleString, on iOS this is not supported.
-  List<String> _styleStrings = [
+  final List<String> _styleStrings = [
     MapboxStyles.MAPBOX_STREETS,
     MapboxStyles.SATELLITE,
     "assets/style.json"
   ];
-  List<String> _styleStringLabels = [
+  final List<String> _styleStringLabels = [
     "MAPBOX_STREETS",
     "SATELLITE",
     "LOCAL_ASSET"
@@ -501,9 +502,26 @@ class MapUiBodyState extends State<MapUiBody> {
       ],
     );
   }
-
-  void onMapCreated(MapboxMapController controller) {
-    mapController = controller;
+// load image asset
+  Future<Uint8List> _loadImageFromAsset() async {
+    final bytes = await rootBundle.load('assets/map-marker.png');
+    return bytes.buffer.asUint8List();
+  }
+  void onMapCreated(MapboxMapController controller) async {
+     var markerImage = await _loadImageFromAsset();
+  // mapController
+   
+    // add image to map
+    mapController?.addImage('marker', markerImage);
+ Position position = await determinePosition();
+    // add marker
+    await mapController?.addSymbol( SymbolOptions(
+      geometry: LatLng(position.latitude,position.longitude),
+      iconImage: "marker",
+      iconSize: 4.5,
+      draggable: true,
+    ));
+    // add line
     mapController!.addListener(_onMapChanged);
     _extractMapInfo();
 
