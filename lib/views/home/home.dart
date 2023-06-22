@@ -1,9 +1,8 @@
 import '/exports/exports.dart';
 
-import 'pages/History.dart';
+import 'pages/Notifications.dart';
 import 'pages/map.dart';
-import 'pages/notifications.dart';
-import 'pages/patientDetials.dart';
+import 'pages/LiveLocationFeed.dart';
 
 class HomePageView extends StatefulWidget {
   const HomePageView({super.key});
@@ -32,7 +31,7 @@ class _HomePageViewState extends State<HomePageView>
   List<Widget> pages = [
      const MapView(),
       Notifications(),
-    const NotificationsView(),
+    const GeolocatorWidget(),
   ];
   // controller
   final PageController _pageController = PageController();
@@ -73,7 +72,7 @@ class _HomePageViewState extends State<HomePageView>
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.message),
-            label: 'Messages',
+            label: 'Live location feed',
           )
         ],
       ),

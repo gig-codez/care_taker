@@ -20,7 +20,7 @@ static void push(BuildContext context, Widget widget){
 }
   static Map<String, Widget Function(BuildContext)> routes = {
       Routes.onBoarding: (context) => const Onboarding(),
-      Routes.login: (context) => const Login(),
+      Routes.login: (context) =>  const LoginView(),
       Routes.signUp: (context) => const SignUp(),
       Routes.home: (context) => const HomePageView(),
    };

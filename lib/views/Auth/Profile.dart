@@ -26,11 +26,6 @@ class _ProfileViewState extends State<ProfileView>
 
   @override
   Widget build(BuildContext context) {
-    return BottomTopMoveAnimationView(
-      animationController: _controller!,
-      child: const SafeArea(
-        child:ProfileScreen(),
-      ),
-    );
+    return Container();
   }
 }

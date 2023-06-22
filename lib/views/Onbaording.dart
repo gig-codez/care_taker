@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '/exports/exports.dart';
@@ -24,7 +25,7 @@ class _OnboardingState extends State<Onboarding>
         vsync: this, value: 0, duration: const Duration(milliseconds: 800));
     _controller?.forward();
      Future.delayed(const Duration(seconds: 5),(){
-      Routes.routeUntil(context, Routes.home);
+      Routes.routeUntil(context,FirebaseAuth.instance.currentUser == null? Routes.login: Routes.home);
      });
   }
 

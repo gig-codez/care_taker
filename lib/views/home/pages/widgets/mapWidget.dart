@@ -1,115 +1,77 @@
-import '/exports/exports.dart';
+import 'package:care_taker/exports/exports.dart';
+import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class MapViewWidget extends StatefulWidget {
-  final MapboxMapController mapController;
-  const MapViewWidget({super.key, required this.mapController});
+import '../../../../controllers/mainController.dart';
+
+class PanelData extends StatefulWidget {
+  const PanelData({super.key});
 
   @override
-  State<MapViewWidget> createState() => _MapViewWidgetState();
+  State<PanelData> createState() => _PanelDataState();
 }
 
-class _MapViewWidgetState extends State<MapViewWidget> {
+class _PanelDataState extends State<PanelData> {
+  final List<Map<String, dynamic>> pos = [
+    {'type': 'Map View', 'icon': Icons.map_rounded, 'mapType': MapType.normal},
+    {
+      'type': 'Satellite View',
+      'icon': Icons.satellite,
+      'mapType': MapType.satellite
+    },
+    {'type': 'Terrain View', 'icon': Icons.terrain, 'mapType': MapType.terrain}
+  ];
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: <Widget>[
-        ListTile(
-          leading: const CircleAvatar(
-            child: Icon(Icons.cameraswitch_rounded),
+    return Column(
+      // mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(
+          height: 20,
+        ),
+        const Center(
+          child: Text(
+            "Select your appropriate view",
+            style: TextStyle(fontSize: 18),
           ),
-          onTap: () {
-            widget.mapController
-                .animateCamera(
-                  CameraUpdate.newCameraPosition(
-                    const CameraPosition(
-                      bearing: 270.0,
-                      target: LatLng(51.5160895, -0.1294527),
-                      tilt: 30.0,
-                      zoom: 17.0,
+        ),
+        const SizedBox(
+          height: 30,
+        ),
+        ChangeNotifierProvider(
+          create: ( context) => MainController(),
+          builder: (c,x) => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: List.generate(
+              pos.length,
+              (index) => InkWell(
+                onTap: () {
+                  Provider.of<MainController>(context)
+                 
+                      .setMapType(pos[index]['mapType']);
+                },
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: Colors.teal,
+                      radius: 30,
+                      child: Icon(
+                        pos[index]['icon'],
+                        size: 30,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                )
-                .then((result) => print(
-                    "widget.mapControlleranimateCamera() returned $result"));
-                    Routes.pop(context);
-          },
-          title: const Text(
-            'Camera Position',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-        ListTile(
-          leading: const CircleAvatar(
-            child: Icon(Icons.location_searching_rounded),
-          ),
-          onTap: () {
-
-            widget.mapController
-                .animateCamera(
-                  CameraUpdate.newLatLng(
-                    const LatLng(56.1725505, 10.1850512),
-                  ),
-                )
-                .then((result) => print(
-                    "widget.mapControlleranimateCamera() returned $result"));
-                    Routes.pop(context);
-          },
-          title: const Text(
-            'New LatLang',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-        ListTile(
-          leading: const CircleAvatar(
-            child: Icon(Icons.add),
-          ),
-          onTap: () {
-            widget.mapController.animateCamera(
-              CameraUpdate.newLatLngBounds(
-                LatLngBounds(
-                  southwest: const LatLng(-38.483935, 113.248673),
-                  northeast: const LatLng(-8.982446, 153.823821),
+                    Text(
+                      "${pos[index]['type']}",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                    ),
+                  ],
                 ),
-                left: 10,
-                top: 5,
-                bottom: 25,
               ),
-            );
-          },
-          title: const Text('New LatLng Bounds',
-              style: TextStyle(color: Colors.white)),
-        ),
-        ListTile(
-          leading: const CircleAvatar(
-            child: Icon(Icons.add),
-          ),
-          onTap: () {
-            widget.mapController.animateCamera(
-              CameraUpdate.newLatLngZoom(
-                const LatLng(37.4231613, -122.087159),
-                11.0,
-              ),
-            );
-            Routes.pop(context);
-          },
-          title: const Text(
-            'New LatLng Zoom',
-            style: TextStyle(color: Colors.white),
+            ),
           ),
         ),
-        ListTile(
-          leading: const CircleAvatar(
-            child: Icon(Icons.threed_rotation_outlined),
-          ),
-          onTap: () {
-            widget.mapController.animateCamera(
-              CameraUpdate.scrollBy(150.0, -225.0),
-              
-            );
-            Routes.pop(context);
-          },
-          title: const Text('ScrollBy', style: TextStyle(color: Colors.white)),
-        ),
+        const Divider(),
       ],
     );
   }

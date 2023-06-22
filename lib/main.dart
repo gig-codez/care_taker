@@ -1,4 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import '/controllers/LocationController.dart';
+
+import 'controllers/MainController.dart';
 import 'exports/exports.dart';
 import 'firebase_options.dart';
 void main() async {
@@ -6,21 +8,32 @@ void main() async {
   await Firebase.initializeApp(
    options: DefaultFirebaseOptions.currentPlatform,
  );
-// //  initializing firebase options
-//   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
+// initialize notifications
+ initializeNotifications();
+ bool checkPermission = await initializeLocationPermissions();
+// initialize geofencing
+if (checkPermission == true) {
+  startGeofencing();
+} else if (checkPermission == false) {
+  // show error message
+  print('permission denied');
+}
+ //
   runApp(
-    MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create:(x) => LocationController()),
+        ChangeNotifierProvider(create: (x) => MainController()),
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(14, 14, 67, 86)),
+          useMaterial3: true,
+        ),
+        initialRoute: Routes.onBoarding ,
+        routes:Routes.routes ,
       ),
-      initialRoute: FirebaseAuth.instance.currentUser == null ? '/onboarding' : '/home',
-      routes:Routes.routes ,
     ),
   );
-
-  // after initialization remove the splash.
-  FlutterNativeSplash.remove();
 }

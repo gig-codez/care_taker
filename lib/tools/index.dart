@@ -1,8 +1,12 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart' as G;
+
 import 'package:intl/intl.dart';
+// import 'package:location/location.dart' as l;
 import '../widgets/space.dart';
 import '/exports/exports.dart';
 void showMessage(
@@ -77,39 +81,160 @@ String formatDate(DateTime date) {
 ///
 /// When the location services are not enabled or permissions
 /// are denied the `Future` will return an error.
-Future<G.Position> determinePosition() async {
-  bool serviceEnabled;
-  G.LocationPermission permission;
+  //  l.Location location = l.Location();
+Future<void> determinePosition() async {
 
-  // Test if location services are enabled.
-  serviceEnabled = await G.Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    // Location services are not enabled don't continue
-    // accessing the position and request users of the 
-    // App to enable the location services.
-    return Future.error('Location services are disabled.');
-  }
 
-  permission = await G.Geolocator.checkPermission();
-  if (permission == G.LocationPermission.denied) {
-    permission = await G.Geolocator.requestPermission();
-    if (permission == G.LocationPermission.denied) {
-      // Permissions are denied, next time you could try
-      // requesting permissions again (this is also where
-      // Android's shouldShowRequestPermissionRationale 
-      // returned true. According to Android guidelines
-      // your App should show an explanatory UI now.
-      return Future.error('Location permissions are denied');
+// bool _serviceEnabled;
+// l.PermissionStatus _permissionGranted;
+
+// _serviceEnabled = await location.serviceEnabled();
+// if (!_serviceEnabled) {
+//   _serviceEnabled = await location.requestService();
+//   if (!_serviceEnabled) {
+    
+//   }
+// }
+
+// _permissionGranted = await location.hasPermission();
+// if (_permissionGranted == l.PermissionStatus.denied) {
+//   _permissionGranted = await location.requestPermission();
+//   if (_permissionGranted != l.PermissionStatus.granted) {
+    
+//   }
+// }
+
+}
+// initialization for Geofence
+final G.Geolocator geolocator = G.Geolocator();
+
+// Define the geofence zones
+final Map<String, LatLng> geofenceZones = {
+  'Green Zone': const LatLng(0.7749, 37.4194),
+  'Yellow Zone': const LatLng(0.7833, 37.4167),
+  'Blue Zone': const LatLng(0.7953, 37.3934),
+};
+// computing distance between two points
+double calculateDistance(double startLatitude,
+  double startLongitude,
+  ) {
+  final distanceInMeters = G.Geolocator.distanceBetween(startLatitude, startLongitude, 0.347596, 32.582520);
+  return distanceInMeters;
+}
+
+// logic to identify change of zones
+ StreamSubscription<G.Position>? positionStream;
+
+void startGeofencing() {
+  positionStream = G.Geolocator.getPositionStream().listen((G.Position position) {
+    final LatLng currentPosition = LatLng(position.latitude, position.longitude);
+
+    // Check if the current position is within any geofence zone
+    for (final entry in geofenceZones.entries) {
+      final String zoneName = entry.key;
+      final LatLng zoneCoordinates = entry.value;
+      final double distance = G.Geolocator.distanceBetween(
+        currentPosition.latitude,
+        currentPosition.longitude,
+        zoneCoordinates.latitude,
+        zoneCoordinates.longitude,
+      );
+
+      // Define the radius of the geofence zone (in meters)
+      const double geofenceRadius = 100.0;
+
+      if (distance <= geofenceRadius) {
+        showNotification('Entered $zoneName');
+      }
     }
-  }
-  
-  if (permission == G.LocationPermission.deniedForever) {
-    // Permissions are denied forever, handle appropriately. 
-    return Future.error(
-      'Location permissions are permanently denied, we cannot request permissions.');
-  } 
+  });
+}
+  final G.GeolocatorPlatform _geolocatorPlatform = G.GeolocatorPlatform.instance;
+  //  initialize location permissions
 
-  // When we reach here, permissions are granted and we can
-  // continue accessing the position of the device.
-  return await G.Geolocator.getCurrentPosition(desiredAccuracy: G.LocationAccuracy.high);
+ Future<bool> initializeLocationPermissions() async {
+  G.LocationPermission  permission;
+      permission = await _geolocatorPlatform.checkPermission();
+    if (permission == G.LocationPermission.denied) {
+      permission = await _geolocatorPlatform.requestPermission();
+      if (permission == G.LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+      
+      permission = await _geolocatorPlatform.requestPermission();
+        return false;
+      }
+    }
+    return true;
+}
+
+// initilaize app notifications
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+// Define notification channels
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'geofence_channel',
+  'Geofence Notifications',
+  importance: Importance.high,
+  playSound: true,
+);
+// ios notification channel
+
+
+void initializeNotifications() {
+//  initialize both android and ios notifications
+  const InitializationSettings initializationSettings =
+      InitializationSettings(android: AndroidInitializationSettings('android12splash'),iOS: DarwinInitializationSettings());
+      // 
+  flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  //  request permission for android and ios notifications
+ 
+flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+    AndroidFlutterLocalNotificationsPlugin>()!.requestPermission();
+    // ios permission
+flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>()
+      ?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+  flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.createNotificationChannel(channel);
+}
+// function to handle notification for change of zones
+void showNotification(String message) async {
+  // android notification specifics
+   AndroidNotificationDetails androidPlatformChannelSpecifics =
+      const AndroidNotificationDetails(
+        
+    'geofence_notification',
+    'Geofence Notifications',
+    importance: Importance.max,
+    priority: Priority.high,
+    playSound: true,
+  );
+  //  ios specifics
+  const DarwinNotificationDetails iosPlatformChannelSpecifics =
+      DarwinNotificationDetails(
+    presentAlert: true,
+    presentBadge: true,
+    presentSound: true,
+  );
+
+   NotificationDetails platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics,iOS: iosPlatformChannelSpecifics);
+
+  await flutterLocalNotificationsPlugin.show(
+    0,
+    'Patient\'s Location',
+    message,
+    platformChannelSpecifics,
+  );
 }

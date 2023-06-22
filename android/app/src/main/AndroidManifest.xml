@@ -14,8 +14,8 @@
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <!-- google maps -->
-    <!-- <meta-data android:name="com.google.android.geo.API_KEY"
-               android:value="AIzaSyCoRlGI0kAyPZiv6CLOja55iv_FkoAT7MM"/> -->
+    <meta-data android:name="com.google.android.geo.API_KEY"
+               android:value="AIzaSyDIIUClw731TnLo1JLVZi_Yxw59l11g3b0"/>
                <!-- end of google maps -->
         <activity
             android:name=".MainActivity"
