@@ -1,11 +1,13 @@
 import '/exports/exports.dart';
 
-class MainController extends ChangeNotifier {
-  MapType _type = MapType.normal;
-  // get
-  MapType get type => _type;
-void setMapType(MapType value) {
-    _type = value;
+class MainController with ChangeNotifier {
+  final Set<Map<String,dynamic>> _fences = {};
+  // getters and setters
+  Set<Map<String,dynamic>> get fences => _fences;
+
+
+  void setFences(Map<String, dynamic> map){
+    _fences.add(map);
     notifyListeners();
   }
 }

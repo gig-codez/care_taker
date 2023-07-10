@@ -1,8 +1,6 @@
-import 'package:care_taker/exports/exports.dart';
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '/exports/exports.dart';
 
-import '../../../../controllers/mainController.dart';
+import '/controllers/mainController.dart';
 
 class PanelData extends StatefulWidget {
   const PanelData({super.key});
@@ -46,9 +44,6 @@ class _PanelDataState extends State<PanelData> {
               pos.length,
               (index) => InkWell(
                 onTap: () {
-                  Provider.of<MainController>(context)
-                 
-                      .setMapType(pos[index]['mapType']);
                 },
                 child: Column(
                   children: [
@@ -63,7 +58,7 @@ class _PanelDataState extends State<PanelData> {
                     ),
                     Text(
                       "${pos[index]['type']}",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w400),
                     ),
                   ],
                 ),

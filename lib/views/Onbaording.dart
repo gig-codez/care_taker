@@ -24,8 +24,8 @@ class _OnboardingState extends State<Onboarding>
     _controller = AnimationController(
         vsync: this, value: 0, duration: const Duration(milliseconds: 800));
     _controller?.forward();
-     Future.delayed(const Duration(seconds: 5),(){
-      Routes.routeUntil(context,FirebaseAuth.instance.currentUser == null? Routes.login: Routes.home);
+     Future.delayed(const Duration(seconds: 2),(){
+      Routes.routeUntil(context,FirebaseAuth.instance.currentUser == null? Routes.login: Routes.setGeofence);
      });
   }
 
@@ -52,10 +52,7 @@ class _OnboardingState extends State<Onboarding>
               ),
                 const CircularProgressIndicator.adaptive(),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03,),
-                const Text(
-                  'Loading.......',
-                  style: TextStyle(fontSize: 30),
-                ),
+               
               ],
             ),
           ),

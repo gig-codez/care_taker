@@ -3,102 +3,136 @@ import 'dart:async';
 
 // import 'package:location/location.dart' as l;
 
-import 'package:care_taker/views/home/pages/widgets/mapWidget.dart';
+import 'package:care_taker/controllers/FencesController.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-import '../../../controllers/MainController.dart';
-import '/controllers/LocationController.dart';
+// import '/controllers/LocationController.dart';
 import '/exports/exports.dart';
 
 const String androidApiKey = "AIzaSyDIIUClw731TnLo1JLVZi_Yxw59l11g3b0";
 const String iOSApiKey = "AIzaSyBYnoDH981M_gkl8vYb_gQxpb0-9ZinMuA";
-final Set<Map<String, dynamic>> geofenceZones = {
-  {
-    'zone': 'Green Zone',
-    'pos': const LatLng(0.2575137, 32.5451041),
-    'color': BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-    'c': Colors.greenAccent,
-  },
-  {
-    'zone': 'Red Zone',
-    'pos': const LatLng(0.2675137, 32.5451041),
-    'color': BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-    'c': Colors.redAccent,
-  },
-  {
-    'zone': 'Yellow Zone',
-    'pos': const LatLng(0.2875137, 32.5451041),
-    'color': BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
-    'c': Colors.yellowAccent,
-  },
-};
 
-class MapView extends StatefulWidget {
-  const MapView({super.key});
+class MapUIView extends StatefulWidget {
+  const MapUIView({super.key});
 
   @override
-  State<MapView> createState() => MapViewState();
+  State<MapUIView> createState() => MapUIViewState();
 }
 
-class MapViewState extends State<MapView> {
+class MapUIViewState extends State<MapUIView> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
   // Location location = Location();
   @override
   void initState() {
     super.initState();
-    context.read<LocationController>().updateLocation();
+    // context.read<LocationController>().updateLocation();
   }
 
   @override
   Widget build(BuildContext context) {
     // invoke determinePosition() from location controller
-    BlocProvider.of<LocationController>(context).updateLocation();
+    // BlocProvider.of<LocationController>(context).updateLocation();
     return Scaffold(
       body: SlidingUpPanel(
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
         ),
-        body: ChangeNotifierProvider(
-          create: (context) => MainController(),
-          builder: (c, x) => GoogleMap(
-            markers: geofenceZones
-                .map(
-                  (e) => Marker(
-                    icon: e['color'],
-                    markerId: MarkerId(e.keys.first),
+        body: BlocConsumer<FencesController, Set<Map<String, dynamic>>>(
+          listener: (context, state) {
+            if(state.isEmpty){
+                showMessage(context: context,msg: "No Fences Found",type: "danger");
+            }
+          },
+          builder: (context, state) {
+            return GoogleMap(
+              mapType: MapType.normal,
+              markers: state.map((e) => Marker(
+                    markerId: MarkerId(e['zone']),
                     position: e['pos'],
+                    icon: e['color'],
                     onTap: () {
-                      // print(e.keys.first);
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return Container(
+                            height: 200,
+                            color: e['c'],
+                            child: Center(
+                              child: Text(
+                                e['zone'],
+                                style: const TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
                     },
-                  ),
-                )
-                .toSet(),
-            mapType: MapType.normal,
-            initialCameraPosition: const CameraPosition(
+                  )).toSet(),
+              initialCameraPosition: const CameraPosition(
                 target: LatLng(0.2475137, 32.5451041),
-                zoom: 49.151926040649414),
-            circles: geofenceZones
-                .map(
-                  (e) => Circle(
-                    circleId: CircleId(e.keys.first),
-                    center: e['pos'],
-                    radius: 50,
-                    strokeColor: e['c'],
-                    onTap: () {
-                      // print(e.keys.first);
+                zoom: 49.151926040649414,
+              ),
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+              },
+            );
+          },
+        ),
+      panel: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
+          )
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 10,),
+            Container(
+              height: 5,
+              width: 50,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(10)
+              ),
+            ),
+            const SizedBox(height: 10,),
+            const Text("Fences",style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold
+            ),),
+            const SizedBox(height: 10,),
+            BlocBuilder<FencesController, Set<Map<String, dynamic>>>(
+              builder: (context, state) {
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: state.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(state.elementAt(index)['zone']),
+                        subtitle: Text(state.elementAt(index)['pos'].toString()),
+                        trailing: IconButton(
+                          onPressed: (){
+                            // BlocProvider.of<FencesController>(context).removeFence(state.elementAt(index));
+                          },
+                          icon: const Icon(Icons.delete),
+                        ),
+                      );
                     },
                   ),
-                )
-                .toSet(),
-            onMapCreated: (GoogleMapController controller) {
-              _controller.complete(controller);
-            },
-          ),
+                );
+              },
+            ),
+          ],
         ),
-        panel: const PanelData(),
+      )
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _goToTheLake,
@@ -119,14 +153,6 @@ class MapViewState extends State<MapView> {
             tilt: 0.440717697143555,
             zoom: 89.151926040649414),
       ),
-
     );
-    Map<String,dynamic> d = {
-       'zone': 'Yellow Zone',
-    'pos':  LatLng(position.latitude, position.longitude),
-    'color': BitmapDescriptor.defaultMarker,
-    'c': Colors.black,
-      };
-      geofenceZones.addAll([d]);
   }
 }

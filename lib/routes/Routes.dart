@@ -1,9 +1,11 @@
+import '../views/fences/GeofenceSet.dart';
 import '/exports/exports.dart';
 class Routes {
   static String onBoarding = "/onboarding";
   static String login = "/login";
   static String signUp = "/signUp";
   static String home = "/home";
+  static String setGeofence = "/setGeofence";
 // helper functions
 static void routeUntil(BuildContext context, String route){
   Navigator.of(context).pushNamedAndRemoveUntil(route, (route) => false);
@@ -15,13 +17,16 @@ static void pop(BuildContext context){
 static void named(BuildContext context, String route){
   Navigator.of(context).pushNamed(route);
 }
+
 static void push(BuildContext context, Widget widget){
   Navigator.of(context).push(MaterialPageRoute(builder: (context) => widget));
 }
+
   static Map<String, Widget Function(BuildContext)> routes = {
       Routes.onBoarding: (context) => const Onboarding(),
       Routes.login: (context) =>  const LoginView(),
       Routes.signUp: (context) => const SignUp(),
       Routes.home: (context) => const HomePageView(),
+      Routes.setGeofence:(context) => const SetGeofence(),
    };
 }

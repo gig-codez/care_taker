@@ -77,34 +77,6 @@ String formatDate(DateTime date) {
 }
 //  get current location from geolocator
 
-/// Determine the current position of the device.
-///
-/// When the location services are not enabled or permissions
-/// are denied the `Future` will return an error.
-  //  l.Location location = l.Location();
-Future<void> determinePosition() async {
-
-
-// bool _serviceEnabled;
-// l.PermissionStatus _permissionGranted;
-
-// _serviceEnabled = await location.serviceEnabled();
-// if (!_serviceEnabled) {
-//   _serviceEnabled = await location.requestService();
-//   if (!_serviceEnabled) {
-    
-//   }
-// }
-
-// _permissionGranted = await location.hasPermission();
-// if (_permissionGranted == l.PermissionStatus.denied) {
-//   _permissionGranted = await location.requestPermission();
-//   if (_permissionGranted != l.PermissionStatus.granted) {
-    
-//   }
-// }
-
-}
 // initialization for Geofence
 final G.Geolocator geolocator = G.Geolocator();
 
@@ -142,7 +114,6 @@ void startGeofencing() {
 
       // Define the radius of the geofence zone (in meters)
       const double geofenceRadius = 100.0;
-
       if (distance <= geofenceRadius) {
         showNotification('Entered $zoneName');
       }
@@ -171,7 +142,7 @@ void startGeofencing() {
     return true;
 }
 
-// initilaize app notifications
+// initialize app notifications
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 // Define notification channels
@@ -182,8 +153,6 @@ const AndroidNotificationChannel channel = AndroidNotificationChannel(
   playSound: true,
 );
 // ios notification channel
-
-
 void initializeNotifications() {
 //  initialize both android and ios notifications
   const InitializationSettings initializationSettings =
@@ -213,7 +182,6 @@ void showNotification(String message) async {
   // android notification specifics
    AndroidNotificationDetails androidPlatformChannelSpecifics =
       const AndroidNotificationDetails(
-        
     'geofence_notification',
     'Geofence Notifications',
     importance: Importance.max,
@@ -237,4 +205,26 @@ void showNotification(String message) async {
     message,
     platformChannelSpecifics,
   );
+}
+
+
+
+String getElapsedTime(Timestamp timestamp) {
+  final currentTime = DateTime.now();
+  final timestampTime = timestamp.toDate();
+
+  final difference = currentTime.difference(timestampTime);
+  final minutes = difference.inMinutes;
+  final hours = difference.inHours;
+  final days = difference.inDays;
+
+  if (days > 0) {
+    return '$days day${days > 1 ? 's' : ''} ago';
+  } else if (hours > 0) {
+    return '$hours hour${hours > 1 ? 's' : ''} ago';
+  } else if (minutes > 0) {
+    return '$minutes minute${minutes > 1 ? 's' : ''} ago';
+  } else {
+    return 'Just now';
+  }
 }

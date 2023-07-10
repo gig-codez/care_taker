@@ -24,15 +24,15 @@ class _LoginViewState extends State<LoginView> {
       required BuildContext context}) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: userEmail, password: password);
+          .signInWithEmailAndPassword(email: userEmail, password: password);
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text('The password provided is too weak.')));
-      } else if (e.code == 'email-already-in-use') {
+      } else if (e.code == 'email-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('The account already exists for that email.')));
+            content: Text('The account does not exists for that email.')));
       }
       return null;
     } catch (e) {
@@ -81,29 +81,39 @@ class _LoginViewState extends State<LoginView> {
                 const SizedBox(
                   height: 20,
                 ),
-               
-                    
-                  ElevatedButton(
-                        onPressed: _isLoading ?(){}: () async {
+                ElevatedButton(
+                  onPressed: _isLoading
+                      ? () {}
+                      : () async {
                           setState(() {
                             _isLoading = true;
                           });
-                          await  _login(
+                          await _login(
                               userEmail: _emailController.text,
                               password: _passwordController.text,
                               context: context);
                           if (FirebaseAuth.instance.currentUser != null) {
-                            Routes.named(context, Routes.home);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  "Login Successful",
+                                ),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                            Routes.named(context, Routes.setGeofence);
                           }
                           setState(() {
                             _isLoading = false;
                           });
                         },
-                        child: _isLoading ? const CircularProgressIndicator.adaptive() : const Text(
+                  child: _isLoading
+                      ? const CircularProgressIndicator.adaptive()
+                      : const Text(
                           'Login',
                           style: TextStyle(fontSize: 17),
                         ),
-                      ),
+                ),
                 const SizedBox(
                   height: 30,
                 ),

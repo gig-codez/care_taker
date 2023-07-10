@@ -1,38 +1,42 @@
-import '/controllers/LocationController.dart';
+import 'package:care_taker/controllers/FencesController.dart';
+import 'package:flutter/services.dart';
 
-import 'controllers/MainController.dart';
 import 'exports/exports.dart';
 import 'firebase_options.dart';
+
 void main() async {
- WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge, overlays: [SystemUiOverlay.bottom, SystemUiOverlay.top]);
+   SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.transparent,
+        systemNavigationBarDividerColor: Colors.transparent,
+      ),
+    );
   await Firebase.initializeApp(
-   options: DefaultFirebaseOptions.currentPlatform,
- );
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 // initialize notifications
- initializeNotifications();
- bool checkPermission = await initializeLocationPermissions();
-// initialize geofencing
-if (checkPermission == true) {
-  startGeofencing();
-} else if (checkPermission == false) {
-  // show error message
-  print('permission denied');
-}
- //
+  initializeNotifications();
+
+  // await initializeLocationPermissions();
+  //
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(create:(x) => LocationController()),
-        ChangeNotifierProvider(create: (x) => MainController()),
+        BlocProvider(
+          create: (context) => FencesController(),
+        )
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(14, 14, 67, 86)),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(14, 14, 67, 86),
+          ),
           useMaterial3: true,
         ),
-        initialRoute: Routes.onBoarding ,
-        routes:Routes.routes ,
+        initialRoute: Routes.onBoarding,
+        routes: Routes.routes,
       ),
     ),
   );

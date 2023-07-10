@@ -35,6 +35,8 @@ class _GeolocatorWidgetState extends State<GeolocatorWidget> {
   @override
   void initState() {
     super.initState();
+     initializeLocationPermissions();
+// initialize geofencing
     _toggleServiceStatusStream();
     // update scroll position
    
@@ -114,7 +116,7 @@ if (_scrollController.hasClients){
   curve: Curves.easeInOutSine, // Adjust the curve as per your preference
 );
 } return Scaffold(
-      appBar: AppBar(title: const Text('CareTaker\'s tracker view '), actions: [
+      appBar: AppBar(title: const Text('CareTaker\'s tracker view '),leading: Container(), actions: [
         _createActions(),
       ]),
       backgroundColor: Theme.of(context).backgroundColor,
@@ -148,9 +150,10 @@ if (_scrollController.hasClients){
                 child: ListTile(
                   leading: const Icon(Icons.location_on),
                   title: Text(
-                    
-                    positionItem.displayValue,
+                    "$liveDistance km away",
+                    //positionItem.displayValue,
                     style: const TextStyle(),
+                    
                   ),
                 ),
               );
@@ -184,10 +187,10 @@ if (_scrollController.hasClients){
             child: const Icon(Icons.my_location),
           ),
           sizedBox,
-          FloatingActionButton(
-            onPressed: _getLastKnownPosition,
-            child: const Icon(Icons.bookmark),
-          ),
+          // FloatingActionButton(
+          //   onPressed: _getLastKnownPosition,
+          //   child: const Icon(Icons.bookmark),
+          // ),
         ],
       ),
     );
@@ -275,6 +278,7 @@ if (_scrollController.hasClients){
   Color _determineButtonColor() {
     return _isListening() ? Colors.green : Colors.red;
   }
+  double liveDistance = 0.0;
 
   void _toggleServiceStatusStream() {
     if (_serviceStatusStreamSubscription == null) {
@@ -319,6 +323,9 @@ if (_scrollController.hasClients){
       }).listen((position) {
         Future.delayed(const Duration(seconds: 1), () {
            double x = calculateDistance(position.latitude, position.longitude);
+           setState(() {
+             liveDistance = x;
+           });
         showNotification("Your have moved $x to $position");
         });
        
@@ -353,20 +360,6 @@ if (_scrollController.hasClients){
   }
 
 
-  void _getLastKnownPosition() async {
-    final position = await _geolocatorPlatform.getLastKnownPosition();
-    if (position != null) {
-      _updatePositionList(
-        _PositionItemType.position,
-        position.toString(),
-      );
-    } else {
-      _updatePositionList(
-        _PositionItemType.log,
-        'No last known position available',
-      );
-    }
-  }
 
   void _getLocationAccuracy() async {
     final status = await _geolocatorPlatform.getLocationAccuracy();

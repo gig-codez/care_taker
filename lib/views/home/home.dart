@@ -1,6 +1,8 @@
+import 'package:care_taker/views/home/messages/ChartUi.dart';
+
 import '/exports/exports.dart';
 
-import 'pages/Notifications.dart';
+import 'messages/Chart.dart';
 import 'pages/map.dart';
 import 'pages/LiveLocationFeed.dart';
 
@@ -29,8 +31,8 @@ class _HomePageViewState extends State<HomePageView>
 
 // pages
   List<Widget> pages = [
-     const MapView(),
-      Notifications(),
+     const MapUIView(),
+       const ChatScreen(receiverId: 'XRFnFEachfcaQPVVUor7d11AYkY2',),
     const GeolocatorWidget(),
   ];
   // controller
@@ -68,7 +70,7 @@ class _HomePageViewState extends State<HomePageView>
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.notifications),
-            label: 'Notifications',
+            label: 'Observations',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.message),
