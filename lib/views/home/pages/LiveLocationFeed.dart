@@ -1,8 +1,11 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, unused_local_variable
 
 import 'dart:async';
 import 'dart:io' show Platform;
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../controllers/FencesController.dart';
 import '/tools/index.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -35,11 +38,8 @@ class _GeolocatorWidgetState extends State<GeolocatorWidget> {
   @override
   void initState() {
     super.initState();
-     initializeLocationPermissions();
-// initialize geofencing
-    _toggleServiceStatusStream();
+    initializeLocationPermissions();
     // update scroll position
-   
   }
 
   PopupMenuButton _createActions() {
@@ -96,7 +96,7 @@ class _GeolocatorWidgetState extends State<GeolocatorWidget> {
 
   @override
   void dispose() {
-   if (_positionStreamSubscription != null) {
+    if (_positionStreamSubscription != null) {
       _positionStreamSubscription!.cancel();
       _positionStreamSubscription = null;
     }
@@ -109,103 +109,135 @@ class _GeolocatorWidgetState extends State<GeolocatorWidget> {
     const sizedBox = SizedBox(
       height: 10,
     );
-if (_scrollController.hasClients){
-   _scrollController.animateTo(
-  _scrollController.position.maxScrollExtent,
-  duration: const Duration(milliseconds: 900), // Adjust the duration as per your preference
-  curve: Curves.easeInOutSine, // Adjust the curve as per your preference
-);
-} return Scaffold(
-      appBar: AppBar(title: const Text('CareTaker\'s tracker view '),leading: Container(), actions: [
-        _createActions(),
-      ]),
-      backgroundColor: Theme.of(context).backgroundColor,
-      body: Scrollbar(
-        interactive: true,
-        radius: Radius.circular(20),
-        controller: _scrollController,
-        trackVisibility: true,
-        thickness: 10,
-        thumbVisibility: true,
-        child: ListView.builder(
-          
-          controller: _scrollController,
-          itemCount: _positionItems.length,
-          itemBuilder: (context, index) {
-            final positionItem = _positionItems[index];
-      
-            if (positionItem.type == _PositionItemType.log) {
-              return ListTile(
-                leading: const Icon(Icons.info),
-                tileColor: Colors.blueGrey,
-                title: Text(positionItem.displayValue,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    )),
-              );
-            } else {
-              return Card(
-                child: ListTile(
-                  leading: const Icon(Icons.location_on),
-                  title: Text(
-                    "$liveDistance km away",
-                    //positionItem.displayValue,
-                    style: const TextStyle(),
-                    
-                  ),
-                ),
-              );
-            }
-          },
-        ),
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(
+            milliseconds: 900), // Adjust the duration as per your preference
+        curve: Curves.easeInOutSine, // Adjust the curve as per your preference
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(
+          title: const Text('CareTaker\'s tracker view '),
+          leading: Container(),
+          actions: [
+            _createActions(),
+          ]),
+      backgroundColor: Theme.of(context).colorScheme.background,
+      body: BlocConsumer<FencesController, Set<Map<String, dynamic>>>(
+        listener: (context, state) {
+          if (positionStreamStarted) {
+            Future.delayed(const Duration(seconds: 3), () {
+              for (var element in state) {
+                _toggleServiceStatusStream(
+                  lat: element['pos'].latitude,
+                  long: element['pos'].longitude,
+                );
+              }
+            });
+          }
+        },
+        builder: (context, state) {
+          // initialize geofencing
+          return Scrollbar(
+            interactive: true,
+            radius: const Radius.circular(20),
+            controller: _scrollController,
+            trackVisibility: true,
+            thickness: 10,
+            thumbVisibility: true,
+            child: ListView.builder(
+              controller: _scrollController,
+              itemCount: _positionItems.length,
+              itemBuilder: (context, index) {
+                final positionItem = _positionItems[index];
+
+                if (positionItem.type == _PositionItemType.log) {
+                  return ListTile(
+                    leading: const Icon(Icons.info),
+                    tileColor: Colors.blueGrey,
+                    title: Text(positionItem.displayValue,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        )),
+                  );
+                } else {
+                  return Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.location_on),
+                      title: Text(
+                        "$liveDistance meters away",
+                        //positionItem.displayValue,
+                        
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+          );
+        },
       ),
-      floatingActionButton: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              positionStreamStarted = !positionStreamStarted;
-              _toggleListening();
-            },
-            tooltip: (_positionStreamSubscription == null)
-                ? 'Start position updates'
-                : _positionStreamSubscription!.isPaused
-                    ? 'Resume'
-                    : 'Pause',
-            backgroundColor: _determineButtonColor(),
-            child: (_positionStreamSubscription == null ||
-                    _positionStreamSubscription!.isPaused)
-                ? const Icon(Icons.play_arrow)
-                : const Icon(Icons.pause),
-          ),
-          sizedBox,
-          FloatingActionButton(
-            onPressed: _getCurrentPosition,
-            child: const Icon(Icons.my_location),
-          ),
-          sizedBox,
-          // FloatingActionButton(
-          //   onPressed: _getLastKnownPosition,
-          //   child: const Icon(Icons.bookmark),
-          // ),
-        ],
+      floatingActionButton:
+          BlocConsumer<FencesController, Set<Map<String, dynamic>>>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          if (!positionStreamStarted) {
+            Future.delayed(const Duration(seconds: 3), () {
+              for (var element in state) {
+                _toggleListening(
+                    lat: element['pos'].latitude,
+                    long: element['pos'].longitude,name: "${element['zone']}");
+              }
+            });
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              FloatingActionButton(
+                onPressed: () {
+                
+                    positionStreamStarted = !positionStreamStarted;
+                  
+                  // _toggleListening();
+                },
+                tooltip: (_positionStreamSubscription == null)
+                    ? 'Start position updates'
+                    : _positionStreamSubscription!.isPaused
+                        ? 'Resume'
+                        : 'Pause',
+                backgroundColor: _determineButtonColor(),
+                child: (_positionStreamSubscription == null ||
+                        _positionStreamSubscription!.isPaused)
+                    ? const Icon(Icons.play_arrow)
+                    : const Icon(Icons.pause),
+              ),
+              sizedBox,
+              // FloatingActionButton(
+              //   onPressed: _getCurrentPosition,
+              //   child: const Icon(Icons.my_location),
+              // ),
+              sizedBox,
+              // FloatingActionButton(
+              //   onPressed: _getLastKnownPosition,
+              //   child: const Icon(Icons.bookmark),
+              // ),
+            ],
+          );
+        },
       ),
     );
   }
 
   Future<void> _getCurrentPosition() async {
     final hasPermission = await _handlePermission();
-
-    if (!hasPermission) {
-      return;
-    }
-
     final position = await _geolocatorPlatform.getCurrentPosition();
-    double x = calculateDistance(position.latitude, position.longitude);
-  showNotification("Your have moved ${x.toInt()} ");
+    // double x = calculateDistance(position.latitude, position.longitude);
+    // showNotification("Your have moved ${x.toInt()} ");
     _updatePositionList(
       _PositionItemType.position,
       position.toString(),
@@ -278,9 +310,10 @@ if (_scrollController.hasClients){
   Color _determineButtonColor() {
     return _isListening() ? Colors.green : Colors.red;
   }
+
   double liveDistance = 0.0;
 
-  void _toggleServiceStatusStream() {
+  void _toggleServiceStatusStream({double lat = 0.0, double long = 0.0}) {
     if (_serviceStatusStreamSubscription == null) {
       final serviceStatusStream = _geolocatorPlatform.getServiceStatusStream();
       _serviceStatusStreamSubscription =
@@ -291,7 +324,7 @@ if (_scrollController.hasClients){
         String serviceStatusValue;
         if (serviceStatus == ServiceStatus.enabled) {
           if (positionStreamStarted) {
-            _toggleListening();
+            _toggleListening(lat: lat, long: long);
           }
           serviceStatusValue = 'enabled';
         } else {
@@ -313,28 +346,30 @@ if (_scrollController.hasClients){
     }
   }
 
-  void _toggleListening() {
+  void _toggleListening({double? lat, double? long,String name = ""}) {
     if (_positionStreamSubscription == null) {
       final positionStream = _geolocatorPlatform.getPositionStream();
-      
+
       _positionStreamSubscription = positionStream.handleError((error) {
         _positionStreamSubscription?.cancel();
         _positionStreamSubscription = null;
       }).listen((position) {
-        Future.delayed(const Duration(seconds: 1), () {
-           double x = calculateDistance(position.latitude, position.longitude);
-           setState(() {
-             liveDistance = x;
-           });
-        showNotification("Your have moved $x to $position");
+        Future.delayed(const Duration(seconds: 3), () {
+          // startGeofencing();
+          double x = calculateDistance(
+              position.latitude, position.longitude, lat!, long!);
+          setState(() {
+            liveDistance = x;
+          });
+          showNotification("Your have moved ${x.toInt()} to $name");
         });
-       
+
         _updatePositionList(
           _PositionItemType.position,
           position.toString(),
         );
       });
-      
+
       _positionStreamSubscription?.pause();
     }
 
@@ -358,8 +393,6 @@ if (_scrollController.hasClients){
       );
     });
   }
-
-
 
   void _getLocationAccuracy() async {
     final status = await _geolocatorPlatform.getLocationAccuracy();

@@ -28,6 +28,87 @@ class _SetGeofenceState extends State<SetGeofence> {
         systemNavigationBarDividerColor: Colors.transparent,
       ),
     );
+    Future.delayed(const Duration(seconds: 2), () {
+      showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              child: SizedBox(
+                height: 550,
+                width: 500,
+                child: Padding(
+                  padding: const EdgeInsets.all(18.0),
+                  child: Column(
+                    children: [
+                      RichText(
+                        text: const TextSpan(
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "Instructions..\n\n",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(
+                              text:
+                                  'Hello, Welcome to the Caretaker app. Please read the instructions below to proceed.\n\n',
+                            ),
+                            TextSpan(
+                              text:
+                                  'The app uses different colors to indicate the safe and unsafe zones on the map.\n\n',
+                            ),
+                            TextSpan(
+                              text: '• Green indicates the safe zone\n',
+                            ),
+                            TextSpan(
+                              text: '• Yellow indicates the unsafe zone\n',
+                            ),
+                            TextSpan(
+                              text: '• Red indicates the dangerous zone.\n\n',
+                            ),
+                            TextSpan(
+                              text:
+                                  'Ensure to set the zones according to what you consider safe, unsafe and dangerous.',
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Spacer(),
+                          // TextButton(
+                          //   onPressed: () {
+                          //     Navigator.pop(context);
+                          //   },
+                          //   child: const Text(
+                          //     "Cancel",style: TextStyle(color: Colors.red),
+                          //   ),
+                          // ),
+                          Padding(
+                            padding: const EdgeInsets.all(18.0),
+                            child: TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text(
+                                  "Okay",
+                                )),
+                          )
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            );
+          });
+    });
   }
 
   @override
@@ -75,7 +156,6 @@ class _SetGeofenceState extends State<SetGeofence> {
                       return const YellowZone();
                     }),
                   );
-                  
                 });
               },
               child: const Center(

@@ -81,23 +81,23 @@ String formatDate(DateTime date) {
 final G.Geolocator geolocator = G.Geolocator();
 
 // Define the geofence zones
-final Map<String, LatLng> geofenceZones = {
-  'Green Zone': const LatLng(0.7749, 37.4194),
-  'Yellow Zone': const LatLng(0.7833, 37.4167),
-  'Blue Zone': const LatLng(0.7953, 37.3934),
-};
+// final Map<String, LatLng> geofenceZones = {
+//   'Green Zone': const LatLng(0.7749, 37.4194),
+//   'Yellow Zone': const LatLng(0.7833, 37.4167),
+//   'Blue Zone': const LatLng(0.7953, 37.3934),
+// };
 // computing distance between two points
 double calculateDistance(double startLatitude,
-  double startLongitude,
+  double startLongitude,double endLatitude,double endLongitude
   ) {
-  final distanceInMeters = G.Geolocator.distanceBetween(startLatitude, startLongitude, 0.347596, 32.582520);
+  final distanceInMeters = G.Geolocator.distanceBetween(startLatitude, startLongitude, endLatitude, endLongitude);
   return distanceInMeters;
 }
 
 // logic to identify change of zones
  StreamSubscription<G.Position>? positionStream;
 
-void startGeofencing() {
+void startGeofencing(Map<String, LatLng> geofenceZones) {
   positionStream = G.Geolocator.getPositionStream().listen((G.Position position) {
     final LatLng currentPosition = LatLng(position.latitude, position.longitude);
 

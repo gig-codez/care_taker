@@ -33,7 +33,6 @@ class MapUIViewState extends State<MapUIView> {
   @override
   Widget build(BuildContext context) {
     // invoke determinePosition() from location controller
-    // BlocProvider.of<LocationController>(context).updateLocation();
     return Scaffold(
       body: SlidingUpPanel(
         borderRadius: const BorderRadius.only(

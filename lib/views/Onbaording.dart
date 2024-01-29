@@ -24,7 +24,7 @@ class _OnboardingState extends State<Onboarding>
     _controller = AnimationController(
         vsync: this, value: 0, duration: const Duration(milliseconds: 800));
     _controller?.forward();
-     Future.delayed(const Duration(seconds: 2),(){
+     Future.delayed(const Duration(seconds: 4),(){
       Routes.routeUntil(context,FirebaseAuth.instance.currentUser == null? Routes.login: Routes.setGeofence);
      });
   }
